@@ -45,11 +45,53 @@ export class App extends Component {
     }));
   };
 
+
+
   onLoadMoreBtnClick = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
     }));
   };
+
+  async fetchQuery(query, page) {
+    try {
+      await fetchData(query, page).then(result => {
+        const data = result.data;
+        const total = data.totalHits;
+        const picsArr = data.hits;
+        const picsLeft = total - 12 * this.state.page;
+
+        if (picsArr.length === 0) {
+          this.setState({ showLoadMoreBtn: false });
+          Notiflix.Notify.failure(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+          return;
+        } else {
+          this.setState(prevState => ({
+            picsArr: [...prevState.picsArr, ...picsArr],
+          }));
+        }
+
+        if (picsArr.length > 0 && this.state.page === 1) {
+          Notiflix.Notify.success(
+            `Hooray! We found ${total} images.`
+          );
+        }
+
+        picsLeft > 0
+          ? this.setState({ showLoadMoreBtn: true })
+          : this.setState({ showLoadMoreBtn: false });
+      });
+    } catch (error) {
+      console.log(error);
+      Notiflix.Notify.failure(
+        'Sorry, something went wrong, please try again later'
+      );
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  }
 
   render() {
     return (
