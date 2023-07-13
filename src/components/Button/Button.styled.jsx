@@ -7,6 +7,7 @@ export const BtnElement = styled.button`
   border-radius: 8px;
   padding: 12px 16px;
   border: none;
+  cursor: pointer;
   font-size: 16px;
   background-color: ${props =>
     props.status === 'search'
